@@ -1,0 +1,1 @@
+# Les modèles Favori et ListePerso sont dans tourism_app/models.py
