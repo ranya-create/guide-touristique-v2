@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Itinéraire Touristique</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+        }
+
+        .app-bar {
+            background-color: #1976D2;
+            color: white;
+            padding: 16px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .app-bar h1 {
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        .content {
+            padding: 16px;
+            margin-bottom: 80px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            color: #555;
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #1976D2;
+            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+        }
+
+        input::placeholder {
+            color: #999;
+        }
+
+        .button-container {
+            padding: 16px;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 90;
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background: #1976D2;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            background-color: #1565c0;
+            box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+        }
+
+        button:active {
+            background-color: #0d47a1;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .result-section {
+            display: none;
+        }
+
+        .result-section.show {
+            display: block;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .result-header {
+            color: #1976D2;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .result-value {
+            color: #333;
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .summary-row:last-child {
+            border-bottom: none;
+        }
+
+        .summary-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .summary-value {
+            color: #1976D2;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .steps-container {
+            margin-top: 16px;
+        }
+
+        .steps-header {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1976D2;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .step {
+            background: white;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            border-left: 4px solid #1976D2;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .step-number {
+            font-size: 12px;
+            color: #999;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .step-title {
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 4px;
+            font-size: 16px;
+        }
+
+        .step-details {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .error-card {
+            background: #ffebee;
+            border-radius: 12px;
+            padding: 16px;
+            color: #c62828;
+            margin-bottom: 16px;
+            border-left: 4px solid #c62828;
+            display: none;
+        }
+
+        .error-card.show {
+            display: block;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px 16px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f0f0f0;
+            border-top: 4px solid #1976D2;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #666;
+            font-size: 14px;
+        }
+
+        @media (max-width: 600px) {
+            .app-bar h1 {
+                font-size: 18px;
+            }
+
+            .content {
+                padding: 12px;
+            }
+
+            .card {
+                padding: 12px;
+            }
+
+            .button-container {
+                padding: 12px;
+            }
+
+            button {
+                padding: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-bar">
+        <h1>Itinéraire touristique</h1>
+    </div>
+
+    <div class="container">
+        <div class="content">
+            <div class="error-card" id="error"></div>
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p class="loading-text">Calcul de l'itinéraire...</p>
+            </div>
+
+            <form id="itineraryForm">
+                <div class="card">
+                    <div class="form-group">
+                        <label for="origin">Point de départ</label>
+                        <input 
+                            type="text" 
+                            id="origin" 
+                            placeholder="Casablanca" 
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="destination">Destination</label>
+                        <input 
+                            type="text" 
+                            id="destination" 
+                            placeholder="Fès" 
+                            required
+                        >
+                    </div>
+                </div>
+            </form>
+
+            <div class="result-section" id="result">
+                <div class="result-card">
+                    <div class="result-header">Résumé du voyage</div>
+                    <div class="summary-row">
+                        <span class="summary-label">De</span>
+                        <span class="summary-value" id="resultOrigin"></span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">À</span>
+                        <span class="summary-value" id="resultDestination"></span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Distance</span>
+                        <span class="summary-value" id="totalDistance"></span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Durée estimée</span>
+                        <span class="summary-value" id="totalDuration"></span>
+                    </div>
+                </div>
+
+                <div class="result-card">
+                    <div class="steps-header">Étapes du trajet</div>
+                    <div id="stepsList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="button-container">
+        <button type="submit" form="itineraryForm" id="submitBtn">Générer l'itinéraire</button>
+    </div>
+
+    <script>
+        const form = document.getElementById('itineraryForm');
+        const originInput = document.getElementById('origin');
+        const destinationInput = document.getElementById('destination');
+        const loading = document.getElementById('loading');
+        const result = document.getElementById('result');
+        const error = document.getElementById('error');
+        const submitBtn = document.getElementById('submitBtn');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const origin = originInput.value.trim();
+            const destination = destinationInput.value.trim();
+
+            if (!origin || !destination) {
+                showError('Veuillez remplir tous les champs');
+                return;
+            }
+
+            await generateItinerary(origin, destination);
+        });
+
+        async function generateItinerary(origin, destination) {
+            loading.classList.add('show');
+            error.classList.remove('show');
+            result.classList.remove('show');
+            submitBtn.disabled = true;
+
+            try {
+                const response = await fetch('http://127.0.0.1:5000/api/itinerary/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        origin: origin,
+                        destination: destination
+                    })
+                });
+
+                if (!response.ok) {
+                    const data = await response.json();
+                    throw new Error(data.error || 'Erreur lors du calcul de l\'itinéraire');
+                }
+
+                const data = await response.json();
+                displayResult(data);
+            } catch (err) {
+                showError(err.message);
+                console.error('Erreur:', err);
+            } finally {
+                loading.classList.remove('show');
+                submitBtn.disabled = false;
+            }
+        }
+
+        function displayResult(data) {
+            document.getElementById('resultOrigin').textContent = data.origin;
+            document.getElementById('resultDestination').textContent = data.destination;
+            document.getElementById('totalDistance').textContent = data.total_distance;
+            document.getElementById('totalDuration').textContent = data.total_duration;
+
+            const stepsList = document.getElementById('stepsList');
+            stepsList.innerHTML = '';
+
+            data.steps.forEach((step, index) => {
+                const stepDiv = document.createElement('div');
+                stepDiv.className = 'step';
+                stepDiv.innerHTML = `
+                    <div class="step-number">Étape ${index + 1}</div>
+                    <div class="step-title">${step.name}</div>
+                    <div class="step-details">
+                        ${step.distance} • ${step.duration}
+                    </div>
+                `;
+                stepsList.appendChild(stepDiv);
+            });
+
+            result.classList.add('show');
+            // Scroll to results
+            setTimeout(() => {
+                result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+
+        function showError(message) {
+            error.textContent = '❌ ' + message;
+            error.classList.add('show');
+            error.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Pré-remplir avec des exemples
+        originInput.value = 'Casablanca';
+        destinationInput.value = 'Fès';
+    </script>
+</body>
+</html>
