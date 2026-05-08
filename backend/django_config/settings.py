@@ -21,8 +21,16 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
+
+    # ── Tes apps ───────────────────────────────────────────
     'tourism_app',
     'users',
+
+    # ── Apps de Ranya (ajoutées) ───────────────────────────
+    'ai_planner',
+    'ai_program',
+    'chatbot',
+    'itinerary',
 ]
 
 REST_FRAMEWORK = {
@@ -39,8 +47,8 @@ SIMPLE_JWT = {
 CORS_ALLOW_ALL_ORIGINS = True
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware', # Doit être tout en haut
     'django.middleware.security.SecurityMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -54,7 +62,7 @@ ROOT_URLCONF = 'django_config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -93,3 +101,9 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ── Clé API OpenAI (pour le chatbot et l'IA de Ranya) ─────────
+# Remplace par ta vraie clé depuis https://platform.openai.com
+OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', '')
+
+CORS_ALLOW_ALL_ORIGINS = True # Autorise Chrome à parler à Django

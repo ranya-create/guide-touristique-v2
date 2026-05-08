@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/modern_widgets.dart';
 
 class SearchScreen extends StatefulWidget {
   final List<dynamic>? initialResults;
@@ -74,45 +75,16 @@ class _SearchScreenState extends State<SearchScreen> {
           children: [
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: TextField(
+              child: ModernSearchBar(
                 controller: _controller,
-                decoration: InputDecoration(
-                  hintText: 'Rechercher un lieu, monument, musée...',
-                  prefixIcon: const Icon(
-                    Icons.search,
-                    color: AppTheme.primaryColor,
-                  ),
-                  suffixIcon: _controller.text.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(Icons.clear, color: Colors.grey),
-                          onPressed: () {
-                            _controller.clear();
-                            setState(() {});
-                            _rechercher('');
-                          },
-                        )
-                      : null,
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
-                      color: AppTheme.primaryColor,
-                      width: 2,
-                    ),
-                  ),
-                ),
+                hint: 'Rechercher un lieu, monument, musée...',
                 onChanged: (value) {
                   setState(() {});
                   _rechercher(value.trim());
+                },
+                onClear: () {
+                  setState(() {});
+                  _rechercher('');
                 },
               ),
             ),

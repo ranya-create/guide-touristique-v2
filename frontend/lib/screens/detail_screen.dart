@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../services/auth_service.dart';
-import '../services/itinerary_service.dart';
 import '../theme/app_theme.dart';
 import 'itinerary_screen.dart';
 import 'package:share_plus/share_plus.dart';
@@ -31,7 +30,6 @@ class _DetailScreenState extends State<DetailScreen> {
 
   @override
   void dispose() {
-    ItineraryService.clearCache();
     super.dispose();
   }
 
@@ -283,7 +281,7 @@ ${description.isNotEmpty ? '$description\n\n' : ''}Partagé depuis Guide Tourist
                       widget.lieu['adresse'].toString().isNotEmpty)
                     Card(
                       elevation: 0,
-                      color: AppTheme.lightBackgroundColor,
+                      color: AppTheme.backgroundColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -344,7 +342,7 @@ ${description.isNotEmpty ? '$description\n\n' : ''}Partagé depuis Guide Tourist
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: AppTheme.lightBackgroundColor,
+                        color: AppTheme.backgroundColor,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
