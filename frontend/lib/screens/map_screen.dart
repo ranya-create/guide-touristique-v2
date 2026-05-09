@@ -4,6 +4,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import '../services/api_service.dart';
 import '../services/auth_service.dart';
+import '../services/route_service.dart';
 import '../theme/app_theme.dart';
 import 'detail_screen.dart';
 import 'search_screen.dart';
@@ -29,6 +30,8 @@ class _MapScreenState extends State<MapScreen> {
   Set<String> _favorisIds = {};
   Set<String> _selectedCategories = {};
   List<String> _availableCategories = [];
+  List<LatLng> _routePoints = [];
+  late final VoidCallback _routeListener;
 
   @override
   void initState() {
@@ -37,6 +40,10 @@ class _MapScreenState extends State<MapScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadData();
     });
+    _routeListener = _onRouteChanged;
+    RouteService.routePoints.addListener(_routeListener);
+    // Initialiser avec la valeur actuelle au cas où elle existe déjà
+    _routePoints = RouteService.routePoints.value;
   }
 
   Future<void> _loadData() async {
@@ -72,6 +79,30 @@ class _MapScreenState extends State<MapScreen> {
         }
       }
     } catch (_) {}
+  }
+
+  void _onRouteChanged() {
+    final newRoutePoints = RouteService.routePoints.value;
+    if (mounted) {
+      setState(() {
+        _routePoints = newRoutePoints;
+      });
+    }
+
+    if (newRoutePoints.isNotEmpty) {
+      Future.microtask(() {
+        try {
+          final bounds = LatLngBounds.fromPoints(newRoutePoints);
+          _mapController.fitCamera(
+            CameraFit.bounds(
+              bounds: bounds,
+              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 40),
+              maxZoom: 14,
+            ),
+          );
+        } catch (_) {}
+      });
+    }
   }
 
   Future<void> _loadFavoris() async {
@@ -244,6 +275,7 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   void dispose() {
+    RouteService.routePoints.removeListener(_routeListener);
     _searchController.dispose();
     super.dispose();
   }
@@ -270,6 +302,71 @@ class _MapScreenState extends State<MapScreen> {
                 urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                 userAgentPackageName: 'com.example.guide_touristique',
               ),
+              if (_routePoints.isNotEmpty)
+                PolylineLayer(
+                  polylines: [
+                    Polyline(
+                      points: _routePoints,
+                      color: AppTheme.primaryColor.withAlpha(220),
+                      strokeWidth: 5,
+                    ),
+                  ],
+                ),
+              if (_routePoints.isNotEmpty)
+                MarkerLayer(
+                  markers: [
+                    Marker(
+                      point: _routePoints.first,
+                      width: 42,
+                      height: 42,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: AppTheme.successColor,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withAlpha(64),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.my_location,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Marker(
+                      point: _routePoints.last,
+                      width: 42,
+                      height: 42,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: AppTheme.primaryColor,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withAlpha(64),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.flag,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               if (!_isLoading) MarkerLayer(markers: _markers),
             ],
           ),

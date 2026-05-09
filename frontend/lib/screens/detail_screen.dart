@@ -100,7 +100,7 @@ class _DetailScreenState extends State<DetailScreen> {
       context,
       MaterialPageRoute(
         builder: (_) =>
-            ItineraryScreen(initialLocation: widget.lieu['nom'].toString()),
+            ItineraryScreen(initialDestination: widget.lieu['nom'].toString()),
       ),
     ).then((_) {
       if (mounted) {

@@ -9,6 +9,7 @@ from django.db.models import Q
 import math
 import json
 import hashlib
+import requests
 
 from .models import LieuTouristique, Favori, CategorieLieu, ItineraireEnregistre
 from .serializers import (
@@ -81,6 +82,35 @@ def calculate_distance(lat1, lon1, lat2, lon2):
     c = 2 * math.asin(math.sqrt(a))
     
     return R * c
+
+
+def fetch_osrm_route(origin_lat, origin_lon, destination_lat, destination_lon):
+    """Récupère la route réelle entre deux points via OSRM."""
+    try:
+        url = (
+            'https://router.project-osrm.org/route/v1/driving/'
+            f'{origin_lon},{origin_lat};{destination_lon},{destination_lat}'
+        )
+        params = {
+            'overview': 'full',
+            'geometries': 'geojson',
+            'steps': 'false',
+        }
+        response = requests.get(url, params=params, timeout=10)
+        if response.status_code != 200:
+            return None
+
+        data = response.json()
+        if data.get('code') != 'Ok' or not data.get('routes'):
+            return None
+
+        coordinates = data['routes'][0]['geometry']['coordinates']
+        return [
+            {'lat': coord[1], 'lon': coord[0]}
+            for coord in coordinates
+        ]
+    except Exception:
+        return None
 
 # --- ITINÉRAIRES (Optimisé) ---
 @api_view(['POST'])
@@ -198,22 +228,34 @@ def generate_itinerary(request):
             'distance': f'{final_distance:.1f} km',
             'duration': f'{final_duration} min'
         })
-        
-        result = {'steps': steps}
-        
-        # Mettre en cache pour 1 heure
-        cache.set(cache_key, result, 3600)
-        
+
+        route_points = fetch_osrm_route(
+            origin_lieu.latitude,
+            origin_lieu.longitude,
+            destination_lat,
+            destination_lon,
+        )
+
+        if not route_points:
+            route_points = [
+                {'lat': origin_lieu.latitude, 'lon': origin_lieu.longitude},
+            ]
+            for lieu in intermediate_lieux[:5]:
+                route_points.append({'lat': lieu['lat'], 'lon': lieu['lon']})
+            route_points.append({'lat': destination_lat, 'lon': destination_lon})
+
+        result = {'steps': steps, 'route': route_points}
+
         # Sauvegarder l'itinéraire si l'utilisateur est authentifié
         if request.user.is_authenticated:
             ItineraireEnregistre.objects.create(
                 user=request.user,
                 depart_nom=origin or origin_lieu.nom,
                 arrivee_nom=destination or destination_lieu.nom,
-                points_gps=json.dumps([(p['lat'], p['lon']) for p in intermediate_lieux]),
+                points_gps=json.dumps([(p['lat'], p['lon']) for p in route_points]),
                 nom=f"Itinéraire {origin} -> {destination}"
             )
-        
+
         return Response(result, status=status.HTTP_200_OK)
     
     except Exception as e:

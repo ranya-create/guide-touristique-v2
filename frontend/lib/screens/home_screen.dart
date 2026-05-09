@@ -3,7 +3,7 @@ import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
 import '../main.dart';
 import 'map_screen.dart';
-import 'search_screen.dart';
+//import 'search_screen.dart';
 import 'itinerary_screen.dart';
 import 'ai_program_screen.dart';
 import 'chatbot_screen.dart';
@@ -22,20 +22,10 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   String _username = '';
 
-  final List<Widget> _screens = [
-    const MapScreen(),
-    const SearchScreen(),
-    const ItineraryScreen(),
-    const AiProgramScreen(),
-    const ChatbotScreen(),
-    const FavoritesScreen(),
-    const ListsScreen(),
-    const ProfileScreen(),
-  ];
+  late final List<Widget> _screens;
 
   final List<String> _titles = [
     'Carte',
-    'Recherche',
     'Itinéraire',
     'Programme IA',
     'Chatbot',
@@ -47,6 +37,15 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    _screens = [
+      const MapScreen(),
+      ItineraryScreen(onViewRoute: () => setState(() => _currentIndex = 0)),
+      const AiProgramScreen(),
+      const ChatbotScreen(),
+      const FavoritesScreen(),
+      const ListsScreen(),
+      const ProfileScreen(),
+    ];
     _loadUsername();
   }
 
@@ -92,8 +91,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bool showAppBar = _currentIndex != 0 && _currentIndex != 4;
-    final bool isProfileScreen = _currentIndex == 7;
+    final bool showAppBar = _currentIndex != 0 && _currentIndex != 3;
+    final bool isProfileScreen = _currentIndex == 6;
 
     return Scaffold(
       appBar: showAppBar
@@ -115,19 +114,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   Container(
                     margin: const EdgeInsets.only(right: 8),
                     child: GestureDetector(
-                      onTap: () => setState(() => _currentIndex = 7),
+                      onTap: () => setState(() => _currentIndex = 6),
                       child: Container(
                         padding: const EdgeInsets.all(2),
                         decoration: BoxDecoration(
-                          gradient: _currentIndex == 7
+                          gradient: _currentIndex == 6
                               ? AppTheme.primaryGradient
                               : null,
                           shape: BoxShape.circle,
-                          color: _currentIndex == 7
+                          color: _currentIndex == 6
                               ? null
                               : AppTheme.surfaceColor,
                           boxShadow: [
-                            _currentIndex == 7
+                            _currentIndex == 6
                                 ? AppTheme.mediumShadow
                                 : AppTheme.softShadow,
                           ],
@@ -140,7 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ? _username[0].toUpperCase()
                                 : '?',
                             style: TextStyle(
-                              color: _currentIndex == 7
+                              color: _currentIndex == 6
                                   ? Colors.white
                                   : AppTheme.primaryColor,
                               fontWeight: FontWeight.w600,
@@ -244,11 +243,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
-                  _currentIndex == 1 ? Icons.search : Icons.search_outlined,
+                  _currentIndex == 1
+                      ? Icons.directions
+                      : Icons.directions_outlined,
                   size: _currentIndex == 1 ? 24 : 22,
                 ),
               ),
-              label: 'Recherche',
+              label: 'Itinéraire',
             ),
             BottomNavigationBarItem(
               icon: AnimatedContainer(
@@ -262,12 +263,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 child: Icon(
                   _currentIndex == 2
-                      ? Icons.directions
-                      : Icons.directions_outlined,
+                      ? Icons.auto_awesome
+                      : Icons.auto_awesome_outlined,
                   size: _currentIndex == 2 ? 24 : 22,
                 ),
               ),
-              label: 'Itinéraire',
+              label: 'Programme IA',
             ),
             BottomNavigationBarItem(
               icon: AnimatedContainer(
@@ -281,12 +282,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 child: Icon(
                   _currentIndex == 3
-                      ? Icons.auto_awesome
-                      : Icons.auto_awesome_outlined,
+                      ? Icons.chat_bubble
+                      : Icons.chat_bubble_outline,
                   size: _currentIndex == 3 ? 24 : 22,
                 ),
               ),
-              label: 'Programme IA',
+              label: 'Chatbot',
             ),
             BottomNavigationBarItem(
               icon: AnimatedContainer(
@@ -299,13 +300,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
-                  _currentIndex == 4
-                      ? Icons.chat_bubble
-                      : Icons.chat_bubble_outline,
+                  _currentIndex == 4 ? Icons.favorite : Icons.favorite_outline,
                   size: _currentIndex == 4 ? 24 : 22,
                 ),
               ),
-              label: 'Chatbot',
+              label: 'Favoris',
             ),
             BottomNavigationBarItem(
               icon: AnimatedContainer(
@@ -318,25 +317,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
-                  _currentIndex == 5 ? Icons.favorite : Icons.favorite_outline,
+                  _currentIndex == 5 ? Icons.list_alt : Icons.list_alt_outlined,
                   size: _currentIndex == 5 ? 24 : 22,
-                ),
-              ),
-              label: 'Favoris',
-            ),
-            BottomNavigationBarItem(
-              icon: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: EdgeInsets.all(_currentIndex == 6 ? 8 : 6),
-                decoration: BoxDecoration(
-                  color: _currentIndex == 6
-                      ? AppTheme.primaryColor.withValues(alpha: 0.1)
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  _currentIndex == 6 ? Icons.list_alt : Icons.list_alt_outlined,
-                  size: _currentIndex == 6 ? 24 : 22,
                 ),
               ),
               label: 'Listes',
@@ -344,25 +326,25 @@ class _HomeScreenState extends State<HomeScreen> {
             BottomNavigationBarItem(
               icon: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                padding: EdgeInsets.all(_currentIndex == 7 ? 8 : 6),
+                padding: EdgeInsets.all(_currentIndex == 6 ? 8 : 6),
                 decoration: BoxDecoration(
-                  gradient: _currentIndex == 7
+                  gradient: _currentIndex == 6
                       ? AppTheme.primaryGradient
                       : null,
-                  color: _currentIndex == 7 ? null : AppTheme.surfaceColor,
+                  color: _currentIndex == 6 ? null : AppTheme.surfaceColor,
                   borderRadius: BorderRadius.circular(8),
-                  boxShadow: _currentIndex == 7 ? [AppTheme.softShadow] : null,
+                  boxShadow: _currentIndex == 6 ? [AppTheme.softShadow] : null,
                 ),
                 child: CircleAvatar(
-                  radius: _currentIndex == 7 ? 12 : 11,
+                  radius: _currentIndex == 6 ? 12 : 11,
                   backgroundColor: Colors.transparent,
                   child: Text(
                     _username.isNotEmpty ? _username[0].toUpperCase() : '?',
                     style: TextStyle(
-                      color: _currentIndex == 7
+                      color: _currentIndex == 6
                           ? Colors.white
                           : AppTheme.primaryColor,
-                      fontSize: _currentIndex == 7 ? 12 : 11,
+                      fontSize: _currentIndex == 6 ? 12 : 11,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
