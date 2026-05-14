@@ -3,7 +3,6 @@ import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
 import '../main.dart';
 import 'map_screen.dart';
-//import 'search_screen.dart';
 import 'itinerary_screen.dart';
 import 'ai_program_screen.dart';
 import 'chatbot_screen.dart';
@@ -22,7 +21,8 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   String _username = '';
 
-  late final List<Widget> _screens;
+  // Lazy loading : chaque écran n'est créé qu'au premier accès
+  final Map<int, Widget> _cachedScreens = {};
 
   final List<String> _titles = [
     'Carte',
@@ -37,16 +37,38 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _screens = [
-      const MapScreen(),
-      ItineraryScreen(onViewRoute: () => setState(() => _currentIndex = 0)),
-      const AiProgramScreen(),
-      const ChatbotScreen(),
-      const FavoritesScreen(),
-      const ListsScreen(),
-      const ProfileScreen(),
-    ];
     _loadUsername();
+  }
+
+  // Retourne l'écran depuis le cache, ou le crée s'il n'existe pas encore
+  Widget _getScreen(int index) {
+    if (!_cachedScreens.containsKey(index)) {
+      _cachedScreens[index] = _buildScreen(index);
+    }
+    return _cachedScreens[index]!;
+  }
+
+  Widget _buildScreen(int index) {
+    switch (index) {
+      case 0:
+        return const MapScreen();
+      case 1:
+        return ItineraryScreen(
+          onViewRoute: () => setState(() => _currentIndex = 0),
+        );
+      case 2:
+        return const AiProgramScreen();
+      case 3:
+        return const ChatbotScreen(); // Chargé seulement quand l'utilisateur clique
+      case 4:
+        return const FavoritesScreen();
+      case 5:
+        return const ListsScreen();
+      case 6:
+        return const ProfileScreen();
+      default:
+        return const SizedBox();
+    }
   }
 
   Future<void> _loadUsername() async {
@@ -176,17 +198,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-      body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 300),
-        child: _screens[_currentIndex],
-      ),
+
+      // Lazy loading : seul l'écran actif est affiché,
+      // les autres sont créés à la demande et mis en cache
+      body: _getScreen(_currentIndex),
+
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: AppTheme.surfaceColor,
           boxShadow: [AppTheme.mediumShadow],
           border: Border(
             top: BorderSide(
-              // CORRECTION ICI : withOpacity(0.1) -> withValues(alpha: 0.1)
               color: AppTheme.textMuted.withValues(alpha: 0.1),
               width: 1,
             ),
@@ -317,7 +339,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
-                  _currentIndex == 5 ? Icons.list_alt : Icons.list_alt_outlined,
+                  _currentIndex == 5
+                      ? Icons.list_alt
+                      : Icons.list_alt_outlined,
                   size: _currentIndex == 5 ? 24 : 22,
                 ),
               ),
@@ -333,7 +357,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       : null,
                   color: _currentIndex == 6 ? null : AppTheme.surfaceColor,
                   borderRadius: BorderRadius.circular(8),
-                  boxShadow: _currentIndex == 6 ? [AppTheme.softShadow] : null,
+                  boxShadow:
+                      _currentIndex == 6 ? [AppTheme.softShadow] : null,
                 ),
                 child: CircleAvatar(
                   radius: _currentIndex == 6 ? 12 : 11,
