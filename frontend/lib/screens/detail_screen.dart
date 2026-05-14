@@ -3,6 +3,7 @@ import '../services/api_service.dart';
 import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
 import 'itinerary_screen.dart';
+import 'map_screen.dart';
 import 'package:share_plus/share_plus.dart';
 
 class DetailScreen extends StatefulWidget {
@@ -99,8 +100,15 @@ class _DetailScreenState extends State<DetailScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) =>
-            ItineraryScreen(initialDestination: widget.lieu['nom'].toString()),
+        builder: (_) => ItineraryScreen(
+          initialDestination: widget.lieu['nom'].toString(),
+          onViewRoute: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const MapScreen()),
+            );
+          },
+        ),
       ),
     ).then((_) {
       if (mounted) {

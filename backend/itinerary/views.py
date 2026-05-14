@@ -26,20 +26,40 @@ class ItineraryView(APIView):
 
             geocode_url = 'https://api.openrouteservice.org/geocode/search'
 
+            # Géocodage avec contrainte Maroc
             origin_response = requests.get(geocode_url, params={
                 'api_key': api_key,
                 'text': origin,
-                'size': 1
+                'size': 1,
+                'boundary.country': 'MA'  # Limiter au Maroc
             })
             origin_data = origin_response.json()
+            
+            # Validation du résultat
+            if not origin_data.get('features') or len(origin_data['features']) == 0:
+                return Response(
+                    {'error': f'Lieu de départ "{origin}" non trouvé au Maroc'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
             origin_coords = origin_data['features'][0]['geometry']['coordinates']
 
+            # Géocodage destination avec contrainte Maroc
             dest_response = requests.get(geocode_url, params={
                 'api_key': api_key,
                 'text': destination,
-                'size': 1
+                'size': 1,
+                'boundary.country': 'MA'  # Limiter au Maroc
             })
             dest_data = dest_response.json()
+            
+            # Validation du résultat
+            if not dest_data.get('features') or len(dest_data['features']) == 0:
+                return Response(
+                    {'error': f'Destination "{destination}" non trouvée au Maroc'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
             dest_coords = dest_data['features'][0]['geometry']['coordinates']
 
             route_url = 'https://api.openrouteservice.org/v2/directions/driving-car'
@@ -54,6 +74,13 @@ class ItineraryView(APIView):
 
             route_response = requests.post(route_url, json=body, headers=headers)
             route_data = route_response.json()
+            
+            # Vérifier si une route a été trouvée
+            if not route_data.get('routes') or len(route_data['routes']) == 0:
+                return Response(
+                    {'error': 'Aucune route n\'a pu être calculée entre ces deux lieux'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
             segments = route_data['routes'][0]['segments'][0]['steps']
             steps = []

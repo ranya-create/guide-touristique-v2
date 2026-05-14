@@ -415,7 +415,9 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
                                   horizontal: 14,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.4),
+                                  color: Colors.black.withAlpha(
+                                    (0.4 * 255).round(),
+                                  ),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Row(

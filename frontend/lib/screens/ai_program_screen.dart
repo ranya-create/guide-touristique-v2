@@ -107,10 +107,7 @@ class _AiProgramScreenState extends State<AiProgramScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('Programme IA', style: AppTheme.headlineLarge()),
-                  Text(
-                    'Généré par Llama 3.3',
-                    style: AppTheme.subtitle(),
-                  ),
+                  Text('Généré par Llama 3.3', style: AppTheme.subtitle()),
                 ],
               ),
             ],
@@ -176,8 +173,7 @@ class _AiProgramScreenState extends State<AiProgramScreen> {
                 checkmarkColor: AppTheme.primaryColor,
                 labelStyle: TextStyle(
                   color: selected ? AppTheme.primaryColor : Colors.grey[700],
-                  fontWeight:
-                      selected ? FontWeight.bold : FontWeight.normal,
+                  fontWeight: selected ? FontWeight.bold : FontWeight.normal,
                 ),
               );
             }).toList(),
@@ -224,8 +220,11 @@ class _AiProgramScreenState extends State<AiProgramScreen> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.error_outline,
-                      color: AppTheme.dangerColor, size: 20),
+                  const Icon(
+                    Icons.error_outline,
+                    color: AppTheme.dangerColor,
+                    size: 20,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -250,8 +249,7 @@ class _AiProgramScreenState extends State<AiProgramScreen> {
               child: Center(
                 child: Column(
                   children: [
-                    Icon(Icons.auto_awesome,
-                        size: 64, color: Colors.grey[300]),
+                    Icon(Icons.auto_awesome, size: 64, color: Colors.grey[300]),
                     const SizedBox(height: 16),
                     Text(
                       'Renseignez vos préférences\npour générer un programme personnalisé',
@@ -285,15 +283,16 @@ class _AiProgramScreenState extends State<AiProgramScreen> {
               ],
             ),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: AppTheme.primaryColor.withAlpha(80),
-            ),
+            border: Border.all(color: AppTheme.primaryColor.withAlpha(80)),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.info_outline,
-                  color: AppTheme.primaryColor, size: 20),
+              const Icon(
+                Icons.info_outline,
+                color: AppTheme.primaryColor,
+                size: 20,
+              ),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -340,7 +339,9 @@ class _AiProgramScreenState extends State<AiProgramScreen> {
                 // En-tête du jour
                 Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 12),
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                   decoration: BoxDecoration(
                     color: AppTheme.primaryColor,
                     borderRadius: const BorderRadius.only(
@@ -387,8 +388,7 @@ class _AiProgramScreenState extends State<AiProgramScreen> {
                 ...activities.asMap().entries.map((actEntry) {
                   final act = actEntry.value as Map<String, dynamic>;
                   final cost = act['cost'];
-                  final isLast =
-                      actEntry.key == activities.length - 1;
+                  final isLast = actEntry.key == activities.length - 1;
 
                   return Container(
                     padding: const EdgeInsets.all(14),
@@ -438,7 +438,9 @@ class _AiProgramScreenState extends State<AiProgramScreen> {
                         if (cost != null)
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
                               color: AppTheme.successColor.withAlpha(30),
                               borderRadius: BorderRadius.circular(8),
@@ -490,8 +492,7 @@ class _AiProgramScreenState extends State<AiProgramScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide:
-              const BorderSide(color: AppTheme.primaryColor, width: 2),
+          borderSide: const BorderSide(color: AppTheme.primaryColor, width: 2),
         ),
       ),
     );
