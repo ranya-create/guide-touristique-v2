@@ -48,7 +48,8 @@ class ItineraryView(APIView):
                 'Content-Type': 'application/json'
             }
             body = {
-                'coordinates': [origin_coords, dest_coords]
+                'coordinates': [origin_coords, dest_coords],
+                'format': 'geojson'  # Get coordinates directly instead of encoded polyline
             }
 
             route_response = requests.post(route_url, json=body, headers=headers)
@@ -66,13 +67,21 @@ class ItineraryView(APIView):
 
             total = route_data['routes'][0]['summary']
 
+            # Extract route coordinates from geojson geometry
+            route_coords = []
+            if 'geometry' in route_data['routes'][0] and 'coordinates' in route_data['routes'][0]['geometry']:
+                # GeoJSON format: [lng, lat] -> convert to [lat, lng]
+                for coord in route_data['routes'][0]['geometry']['coordinates']:
+                    route_coords.append([coord[1], coord[0]])  # [lat, lng]
+
             return Response({
                 'status': 'success',
                 'origin': origin,
                 'destination': destination,
                 'total_distance': f"{round(total['distance'] / 1000, 1)} km",
                 'total_duration': f"{round(total['duration'] / 60)} min",
-                'steps': steps
+                'steps': steps,
+                'route': route_coords  # Add the route coordinates
             })
 
         except Exception as e:

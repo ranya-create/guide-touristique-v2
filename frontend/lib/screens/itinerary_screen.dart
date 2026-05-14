@@ -165,7 +165,7 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Planifier votre itinéraire'),
+        title: const Text('planifier R'),
         backgroundColor: AppTheme.primaryColor,
         foregroundColor: Colors.white,
       ),
@@ -320,82 +320,128 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
                   const SizedBox(height: 12),
                   SizedBox(
                     height: 240,
-                    child: FlutterMap(
-                      options: MapOptions(
-                        initialCenter: _routePoints.first,
-                        initialZoom: 11,
-                        interactionOptions: const InteractionOptions(),
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: widget.onViewRoute,
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          FlutterMap(
+                            options: MapOptions(
+                              initialCenter: _routePoints.first,
+                              initialZoom: 11,
+                              interactionOptions: const InteractionOptions(),
+                            ),
+                            children: [
+                              TileLayer(
+                                urlTemplate:
+                                    'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                userAgentPackageName:
+                                    'com.example.guide_touristique',
+                              ),
+                              PolylineLayer(
+                                polylines: [
+                                  Polyline(
+                                    points: _routePoints,
+                                    strokeWidth: 5,
+                                    color: AppTheme.primaryColor.withAlpha(220),
+                                  ),
+                                ],
+                              ),
+                              MarkerLayer(
+                                markers: [
+                                  Marker(
+                                    point: _routePoints.first,
+                                    width: 44,
+                                    height: 44,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: AppTheme.successColor,
+                                        shape: BoxShape.circle,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withAlpha(64),
+                                            blurRadius: 4,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ],
+                                      ),
+                                      child: const Center(
+                                        child: Icon(
+                                          Icons.my_location,
+                                          color: Colors.white,
+                                          size: 22,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Marker(
+                                    point: _routePoints.last,
+                                    width: 44,
+                                    height: 44,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: AppTheme.primaryColor,
+                                        shape: BoxShape.circle,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withAlpha(64),
+                                            blurRadius: 4,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ],
+                                      ),
+                                      child: const Center(
+                                        child: Icon(
+                                          Icons.flag,
+                                          color: Colors.white,
+                                          size: 22,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          if (widget.onViewRoute != null)
+                            Positioned(
+                              bottom: 12,
+                              left: 12,
+                              right: 12,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 10,
+                                  horizontal: 14,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.4),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: const [
+                                    Icon(
+                                      Icons.map,
+                                      color: Colors.white,
+                                      size: 18,
+                                    ),
+                                    SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        'Appuyez pour ouvrir la carte',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
-                      children: [
-                        TileLayer(
-                          urlTemplate:
-                              'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                          userAgentPackageName: 'com.example.guide_touristique',
-                        ),
-                        PolylineLayer(
-                          polylines: [
-                            Polyline(
-                              points: _routePoints,
-                              strokeWidth: 5,
-                              color: AppTheme.primaryColor.withAlpha(220),
-                            ),
-                          ],
-                        ),
-                        MarkerLayer(
-                          markers: [
-                            Marker(
-                              point: _routePoints.first,
-                              width: 44,
-                              height: 44,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: AppTheme.successColor,
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withAlpha(64),
-                                      blurRadius: 4,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ],
-                                ),
-                                child: const Center(
-                                  child: Icon(
-                                    Icons.my_location,
-                                    color: Colors.white,
-                                    size: 22,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Marker(
-                              point: _routePoints.last,
-                              width: 44,
-                              height: 44,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: AppTheme.primaryColor,
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withAlpha(64),
-                                      blurRadius: 4,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ],
-                                ),
-                                child: const Center(
-                                  child: Icon(
-                                    Icons.flag,
-                                    color: Colors.white,
-                                    size: 22,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
                     ),
                   ),
                   const SizedBox(height: 16),
